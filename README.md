@@ -6,10 +6,13 @@ credential attempts, and real post-login behavior. So I stood up an SSH
 honeypot, built a pipeline to enrich and analyze what it caught, and let it
 run for a weekend.
 
-**Results: see [`docs/findings/weekend-report.md`](docs/findings/weekend-report.md)**
-once the collection window closes -- headline numbers, the credential
-patterns that showed up, how many distinct botnet campaigns were actually
-behind the noise (not just how many IPs), and what surprised me.
+**Status: actively collecting.** The sensor went live 2026-09-17 and is
+running the full pipeline (enrichment, detection, clustering) in real time.
+Findings will land in
+[`docs/findings/weekend-report.md`](docs/findings/weekend-report.md) as the
+dataset grows -- headline numbers, credential patterns, how many distinct
+botnet campaigns were actually behind the noise (not just how many IPs),
+and what surprised me. Check back or watch the repo for updates.
 
 ## What this is
 
