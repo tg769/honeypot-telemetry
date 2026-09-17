@@ -1,5 +1,9 @@
 # Weekend findings
 
+**In progress — sensor went live 2026-09-17, collection ongoing.** This file
+fills in as real data accumulates; check the repo's commit history for the
+latest update.
+
 > Fill this in from `data/reports/report-*.md` (the latest auto-generated
 > snapshot) plus your own read of the Splunk dashboard and any sessions you
 > dug into by hand via `docs/runbooks/investigate-finding.md`. Write it like
