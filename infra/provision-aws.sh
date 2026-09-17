@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Provisions the honeypot sensor: dedicated VPC, hardened EC2 instance, budget alarm.
 #
-# You run this yourself (not Claude) -- it creates real, billed AWS resources
-# and opens a port to the internet. Review every step before running.
+# Creates real, billed AWS resources and opens a port to the internet --
+# run only with explicit go-ahead for this specific execution.
 #
 # Prereqs: `aws configure` already run with an account that has EC2/VPC/Budgets
 # permissions, and an EC2 key pair already created (aws ec2 create-key-pair).
@@ -59,6 +59,8 @@ aws ec2 revoke-security-group-egress --region "$REGION" --group-id "$SG_ID" \
   --protocol -1 --cidr 0.0.0.0/0 2>/dev/null || true
 aws ec2 authorize-security-group-egress --region "$REGION" --group-id "$SG_ID" \
   --protocol tcp --port 443 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-egress --region "$REGION" --group-id "$SG_ID" \
+  --protocol tcp --port 80 --cidr 0.0.0.0/0   # Ubuntu's arm64 ports.ubuntu.com mirror is plain HTTP
 aws ec2 authorize-security-group-egress --region "$REGION" --group-id "$SG_ID" \
   --protocol tcp --port 53 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-egress --region "$REGION" --group-id "$SG_ID" \
