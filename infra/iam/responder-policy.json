@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadNaclState",
+      "Effect": "Allow",
+      "Action": ["ec2:DescribeNetworkAcls"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "MutateOnlyTheResponderNacl",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateNetworkAclEntry",
+        "ec2:DeleteNetworkAclEntry",
+        "ec2:ReplaceNetworkAclEntry"
+      ],
+      "Resource": "arn:aws:ec2:*:*:network-acl/REPLACE_WITH_NACL_ID"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+index=honeypot
+| stats count by src_ip
+| sort -count
+| head 20
