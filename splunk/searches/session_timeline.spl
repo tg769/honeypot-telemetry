@@ -1,0 +1,3 @@
+index=honeypot session=$session_id$
+| sort _time
+| table _time, eventid, username, password, input, url

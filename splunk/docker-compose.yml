@@ -1,0 +1,23 @@
+services:
+  splunk:
+    image: splunk/splunk:10.4
+    platform: linux/amd64   # no arm64 image exists yet -- runs emulated on Apple Silicon
+    container_name: secu-splunk
+    hostname: secu-splunk
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_GENERAL_TERMS=--accept-sgt-current-at-splunk-com
+      - SPLUNK_PASSWORD=${SPLUNK_PASSWORD:?set SPLUNK_PASSWORD in splunk/.env}
+      - SPLUNK_HEC_TOKEN=${SPLUNK_HEC_TOKEN:?set SPLUNK_HEC_TOKEN in splunk/.env}
+    ports:
+      - "8000:8000"   # web UI
+      - "8088:8088"   # HEC
+      - "8089:8089"   # management/REST API
+    volumes:
+      - splunk-var:/opt/splunk/var
+      - splunk-etc:/opt/splunk/etc
+    mem_limit: 6g
+
+volumes:
+  splunk-var:
+  splunk-etc:

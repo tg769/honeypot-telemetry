@@ -1,0 +1,8 @@
+index=honeypot eventid="cowrie.login.success"
+| stats min(_time) as login_time by session, src_ip
+| join session
+    [ search index=honeypot eventid="cowrie.command.input"
+      | rename _time as cmd_time ]
+| where cmd_time >= login_time
+| table src_ip, session, cmd_time, input
+| sort src_ip, cmd_time

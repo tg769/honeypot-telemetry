@@ -1,0 +1,52 @@
+<dashboard version="1.1">
+  <label>Honeypot Overview</label>
+  <row>
+    <panel>
+      <title>Events over time</title>
+      <chart>
+        <search>
+          <query>index=honeypot | timechart span=1h count</query>
+        </search>
+        <option name="charting.chart">line</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 20 source IPs</title>
+      <chart>
+        <search>
+          <query>index=honeypot | stats count by src_ip | sort -count | head 20</query>
+        </search>
+        <option name="charting.chart">bar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Top 20 credential pairs</title>
+      <table>
+        <search>
+          <query>index=honeypot eventid IN ("cowrie.login.failed", "cowrie.login.success") | stats count by username, password | sort -count | head 20</query>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Events by type</title>
+      <chart>
+        <search>
+          <query>index=honeypot | stats count by eventid | sort -count</query>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Successful logins</title>
+      <table>
+        <search>
+          <query>index=honeypot eventid="cowrie.login.success" | table _time, src_ip, username, password, session</query>
+        </search>
+      </table>
+    </panel>
+  </row>
+</dashboard>
