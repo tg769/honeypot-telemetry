@@ -15,7 +15,7 @@
         "ec2:DeleteNetworkAclEntry",
         "ec2:ReplaceNetworkAclEntry"
       ],
-      "Resource": "arn:aws:ec2:*:*:network-acl/REPLACE_WITH_NACL_ID"
+      "Resource": "arn:aws:ec2:*:*:network-acl/acl-0128c77b07fac3cae"
     }
   ]
 }
