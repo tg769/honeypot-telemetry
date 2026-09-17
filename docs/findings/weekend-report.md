@@ -1,15 +1,5 @@
 # Weekend findings
 
-**In progress, sensor went live 2026-09-17 and collection is ongoing.** This file
-fills in as real data accumulates; check the repo's commit history for the
-latest update.
-
-> Fill this in from `data/reports/report-*.md` (the latest auto-generated
-> snapshot), plus your own read of the Splunk dashboard and whatever you
-> dug into by hand using `docs/runbooks/investigate-finding.md`. Write it
-> like a lab notebook: what you saw, what surprised you, what you'd change,
-> not like a resume bullet.
-
 ## Headline numbers
 - Collection window: `<start>` to `<end>` (~`<N>` hours)
 - Total events: `<N>`

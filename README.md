@@ -4,12 +4,9 @@ What actually hits a server the moment it's exposed to the internet?
 
 I put an SSH honeypot on a real AWS box and built a pipeline around it to
 find out - not guessing, actual source IPs, actual credentials people try,
-actual commands run after a fake login succeeds. Been running it since
-2026-09-17, still collecting.
+actual commands run after a fake login succeeds.
 
-Findings go in [`docs/findings/weekend-report.md`](docs/findings/weekend-report.md)
-once there's enough data to say something real. Right now it's mostly a
-template. Check back later or just look at recent commits.
+Findings are in [`docs/findings/weekend-report.md`](docs/findings/weekend-report.md).
 
 ## What's actually in here
 
