@@ -5,15 +5,15 @@
         |  :22
         v
 +---------------------------------------+
-| AWS EC2 t4g.micro -- dedicated VPC     |   No instance profile.
+| AWS EC2 t4g.micro, dedicated VPC       |   No instance profile.
 |  iptables 22 -> 2222                   |   IMDSv2 required, hop limit 1.
 |  Cowrie 3.0 (Docker, arm64)            |   Egress: default-deny.
 |  -> var/log/cowrie/cowrie.json         |   Admin SSH :52222, home IP only.
 +---------------------------------------+
-        |  rsync over SSH (pull -- Splunk is never exposed)
+        |  rsync over SSH (pull, so Splunk is never exposed)
         v
 +-------------------------------------------------------------+
-| MacBook -- Python pipeline                                    |
+| MacBook: Python pipeline                                      |
 |                                                               |
 |  collector.py -> ship.py         enrich.py -> detect.py       |
 |       |               |              |            |          |
@@ -30,20 +30,20 @@
                                                  (capped, TTL'd, audited)
 ```
 
-## Data flow
+## How data moves through it
 
-1. **collector.py** rsyncs `cowrie.json` from the sensor down to `data/raw/`, then parses only the newly-arrived complete lines (tracked by a byte offset in `state/collector.json`) and appends them to `data/events.ndjson` -- the single canonical local event store every other script reads from.
-2. **ship.py** pushes new lines from `events.ndjson` to Splunk over HEC, tracking a separate line-count cursor so re-runs never double-ship.
-3. **enrich.py** looks up every distinct source IP against Shodan InternetDB (no key needed) and AbuseIPDB (budgeted, 1000/day free tier), caching results by IP with a 7-day TTL.
-4. **detect.py** runs rule-based detections (brute force, password spray, successful logins, post-exploit command execution, payload staging) plus two original analyses: botnet-family clustering (credential-set + client-version similarity) and Mirai credential-list provenance.
-5. **respond.py** scores every source IP using findings + AbuseIPDB confidence, ranks candidates, filters anything allowlisted or private/loopback, and reconciles against a capped, TTL'd blocklist. Dry-run by default; `--enforce` is required to actually touch AWS.
-6. **report.py** renders a markdown snapshot of the current dataset for quick review; `docs/findings/weekend-report.md` is the hand-curated final deliverable.
-7. **healthcheck.py** checks sensor reachability, log growth, HEC acceptance, and AbuseIPDB quota remaining.
+1. `collector.py` rsyncs `cowrie.json` down from the sensor into `data/raw/`, then parses only the lines that arrived since last time (tracked by a byte offset in `state/collector.json`) and appends them to `data/events.ndjson`. That file is the one thing every other script reads from.
+2. `ship.py` pushes whatever's new in `events.ndjson` to Splunk over HEC. It keeps its own cursor so running it twice doesn't double-ship anything.
+3. `enrich.py` looks up every distinct source IP against Shodan's InternetDB (no key needed) and AbuseIPDB (free tier, budgeted at 1000/day), caching each result for a week so it's not re-querying IPs it already knows about.
+4. `detect.py` runs the actual detection rules: brute force, password spray, successful logins, commands run after a login succeeds, payload downloads. Plus two things that aren't standard rules: grouping IPs into probable botnet campaigns by shared credentials and client fingerprints, and checking what fraction of login attempts match Mirai's published credential list.
+5. `respond.py` scores every IP using those findings plus AbuseIPDB's confidence score, ranks them, throws out anything allowlisted or private, and reconciles against a capped/TTL'd blocklist. It's dry-run unless you pass `--enforce`.
+6. `report.py` writes a markdown snapshot of the current dataset. `docs/findings/weekend-report.md` is the actual hand-written writeup, not something auto-generated.
+7. `healthcheck.py` checks whether the sensor's reachable, the log is growing, HEC is accepting data, and there's still AbuseIPDB quota left.
 
-## Why pull, not push (Splunk side)
+## Why pull instead of push for Splunk
 
-Splunk never has an open port to the internet. The collector reaches out to the sensor over SSH on a schedule; the sensor never initiates a connection to anything on the Mac. See [ADR-0001](decisions/0001-pull-model.md).
+Splunk never has a port open to the internet. The collector reaches out to the sensor on a schedule; the sensor never initiates anything toward the Mac. Reasoning in [ADR-0001](decisions/0001-pull-model.md).
 
-## Why a dedicated VPC
+## Why the sensor gets its own VPC
 
-The AWS account predates this project and has unrelated resources in it. The honeypot sensor lives in its own VPC with no route to anything else, no IAM instance profile, and IMDSv2 with a hop limit of 1 so a compromised container cannot reach instance metadata. See [ADR-0002](decisions/0002-dedicated-vpc-isolation.md).
+This AWS account already had other stuff in it before this project, so the sensor lives in its own VPC with no route to anything else, no IAM instance profile, and IMDSv2 with a hop limit of 1 so a compromised container can't reach instance metadata. Reasoning in [ADR-0002](decisions/0002-dedicated-vpc-isolation.md).

@@ -1,7 +1,7 @@
 services:
   splunk:
     image: splunk/splunk:10.4
-    platform: linux/amd64   # no arm64 image exists yet -- runs emulated on Apple Silicon
+    platform: linux/amd64   # no arm64 image exists yet, runs emulated on Apple Silicon
     container_name: secu-splunk
     hostname: secu-splunk
     environment:

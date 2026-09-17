@@ -26,7 +26,7 @@ RAW_LOG_PATH = DATA_DIR / "raw" / "cowrie.json"
 def pull_from_sensor() -> None:
     """rsync the remote cowrie.json down to RAW_LOG_PATH."""
     if not settings.sensor_host:
-        raise SystemExit("SENSOR_HOST not set -- copy .env.example to .env and fill it in")
+        raise SystemExit("SENSOR_HOST not set, copy .env.example to .env and fill it in")
 
     RAW_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     remote = f"{settings.sensor_ssh_user}@{settings.sensor_host}:{settings.sensor_cowrie_log_path}"
@@ -53,7 +53,7 @@ def parse_new_lines() -> int:
 
     size = RAW_LOG_PATH.stat().st_size
     if size < offset:
-        log.warning("raw log shrank (rotated?) -- resetting offset to 0")
+        log.warning("raw log shrank (rotated?), resetting offset to 0")
         offset = 0
 
     new_events = []
@@ -64,7 +64,7 @@ def parse_new_lines() -> int:
     text = chunk.decode("utf-8", errors="replace")
     lines = text.split("\n")
     # last element is either "" (file ended on a newline) or a partial line
-    # we haven't fully received yet -- don't consume it.
+    # we haven't fully received yet, so don't consume it.
     complete_lines, partial = lines[:-1], lines[-1]
     consumed_bytes = len(("\n".join(complete_lines) + "\n").encode("utf-8")) if complete_lines else 0
 

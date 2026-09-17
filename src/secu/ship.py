@@ -1,6 +1,6 @@
 """Ships new events from the canonical local store to Splunk over HEC.
-Splunk is never internet-exposed (see docs/decisions/0001) -- this is a
-pull-then-push: collector.py pulls from the sensor, this pushes to
+Splunk is never internet-exposed (see docs/decisions/0001). This is a
+pull-then-push setup: collector.py pulls from the sensor, this pushes to
 Splunk running in local Docker.
 
 Tracks a line-count cursor in state/ so re-runs only ship what's new.
@@ -53,7 +53,7 @@ def _hec_batch(batch: list[dict]) -> None:
 
 def ship_new() -> int:
     if not settings.splunk_hec_token:
-        raise SystemExit("SPLUNK_HEC_TOKEN not set -- copy .env.example to .env and fill it in")
+        raise SystemExit("SPLUNK_HEC_TOKEN not set, copy .env.example to .env and fill it in")
 
     state = statefile.load("ship", {"line_count": 0})
     already_shipped = state["line_count"]
