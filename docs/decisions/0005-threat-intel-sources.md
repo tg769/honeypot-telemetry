@@ -1,34 +1,32 @@
-# ADR-0005: Shodan InternetDB + AbuseIPDB; GreyNoise evaluated and dropped
+# ADR-0005: Shodan InternetDB + AbuseIPDB, GreyNoise evaluated and dropped
 
 ## Context
-Enrichment needs a source of reputation/context data per observed IP,
-within a genuinely free tier (this is a personal project, not a company
-card).
+Enrichment needs some source of reputation/context data per IP, and it has
+to be genuinely free since this is a personal project, not something with
+a company card behind it.
 
 ## Decision
-Use two sources:
-- **Shodan InternetDB** (`internetdb.shodan.io`) -- no API key, no signup,
-  no rate limit in practice. Returns open ports, CPEs, tags, and known CVEs
-  for an IP.
-- **AbuseIPDB** free tier -- requires a key, budgeted at 900 checks/day
-  (headroom under their 1000/day limit) with a 7-day disk cache so a re-run
-  never re-spends budget on an IP already looked up.
+Ended up using two sources:
+- Shodan's InternetDB (`internetdb.shodan.io`), no API key, no signup, and
+  no rate limit that actually matters in practice. Returns open ports,
+  CPEs, tags, known CVEs for an IP.
+- AbuseIPDB's free tier, needs a key, budgeted at 900 checks a day (some
+  headroom under their real 1000/day limit), with a 7-day disk cache so a
+  re-run never burns budget on an IP it's already looked up.
 
-**GreyNoise was evaluated and deliberately not used.** Their v2 API was
-retired; the current v3 Community endpoint requires a business email
-address to issue a free API key, and consumer domains (gmail, etc.) are
-rejected. Rather than skip documenting this, it's recorded here: this is
-what "evaluate a tool and it doesn't fit the constraints" looks like in
-practice, which is itself a real part of the job.
+GreyNoise got evaluated and dropped. Their v2 API is retired, and the
+current v3 Community endpoint requires a business email to even get a free
+key, consumer domains like gmail get rejected outright. Worth writing down
+rather than just quietly not using it: "looked at a tool and it didn't fit"
+is a normal outcome, not something to hide.
 
-## Why this matters for the analysis
-InternetDB and AbuseIPDB answer different questions and are combined in
-`respond.py`'s scoring, not treated as interchangeable: InternetDB describes
-what else the IP looks like from the outside (is it a known Tor exit, does
-it have other open services), while AbuseIPDB gives a community-sourced
-abuse confidence score. Neither alone is sufficient reputation signal, which
-is why the responder's scoring weights AbuseIPDB confidence at a fraction
-(0.3x) of its raw value rather than trusting it outright -- this project's
-own observed findings (successful login, post-exploit execution) are
-weighted higher because they're first-hand evidence, not third-party
-reputation.
+## Why this split matters for the actual analysis
+InternetDB and AbuseIPDB answer different questions, and `respond.py`'s
+scoring treats them that way instead of lumping them together. InternetDB
+tells you what the IP looks like from the outside (known Tor exit? other
+open services?), AbuseIPDB gives a community-sourced abuse score. Neither
+one alone is enough signal on its own, which is why the responder only
+weights AbuseIPDB's confidence at a fraction of its raw value (0.3x)
+instead of trusting it outright. What this project actually observed
+first-hand (a real successful login, real commands run afterward) counts
+for more than someone else's reputation score.

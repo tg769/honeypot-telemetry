@@ -3,13 +3,13 @@
 # Target: Ubuntu 24.04 LTS (arm64 / t4g.micro).
 #
 # Fail-safe by design: the iptables redirect that sends public :22 traffic to
-# Cowrie (and away from real sshd) only happens AFTER we've verified sshd is
+# Cowrie (and away from real sshd) only happens after we've verified sshd is
 # actually listening on the admin port. If that verification fails, :22 is
-# left as real, unredirected sshd -- locked out of the bait, not locked out
-# of the box. (Learned the hard way: sshd_config can be edited and `systemctl
-# restart ssh` can succeed with zero errors while sshd still isn't bound to
-# the new port -- e.g. if ssh is socket-activated via ssh.socket, which reads
-# its ListenStream from the systemd unit, not from sshd_config's Port line.)
+# left as real, unredirected sshd. Locked out of the bait, not locked out of
+# the box. (Learned this the hard way: sshd_config can be edited and
+# `systemctl restart ssh` can succeed with zero errors while sshd still isn't
+# bound to the new port, e.g. if ssh is socket-activated via ssh.socket, which
+# reads its ListenStream from the systemd unit, not from sshd_config's Port.)
 set -euo pipefail
 exec > >(tee -a /var/log/secu-bootstrap.log) 2>&1
 set -x
@@ -24,12 +24,12 @@ if ! grep -q "^Port ${REAL_SSH_PORT}" /etc/ssh/sshd_config; then
 fi
 
 # If ssh is socket-activated, the socket unit's ListenStream (not sshd_config)
-# controls the actual port -- override it there too, then reload systemd.
+# controls the actual port. Override it there too, then reload systemd.
 if systemctl list-unit-files ssh.socket >/dev/null 2>&1 && systemctl is-enabled ssh.socket >/dev/null 2>&1; then
   mkdir -p /etc/systemd/system/ssh.socket.d
   # A bare `ListenStream=<port>` defaults to an IPv6-only socket on this
   # systemd/Ubuntu combination, which silently refuses IPv4 connections
-  # (real connections come in as IPv4 -- EC2 public IPs are IPv4). Bind
+  # (real connections come in as IPv4, EC2 public IPs are IPv4). Bind
   # both families explicitly.
   printf '[Socket]\nListenStream=\nListenStream=0.0.0.0:%s\nListenStream=[::]:%s\n' \
     "${REAL_SSH_PORT}" "${REAL_SSH_PORT}" \
@@ -45,7 +45,7 @@ systemctl restart ssh.service || systemctl restart ssh
 #     take a moment to bind. ---
 ADMIN_PORT_LIVE="false"
 for _ in $(seq 1 10); do
-  # A real functional IPv4 connect test, not a textual parse of `ss` --
+  # A real functional IPv4 connect test, not a textual parse of `ss`.
   # 127.0.0.1 is pure IPv4, so this fails the exact same way a real
   # external IPv4 connection would against an IPv6-only listener. That's
   # precisely the bug that bit this script once already: `ss` showed a
@@ -67,7 +67,7 @@ systemctl status ssh.socket --no-pager 2>&1 || true
 echo "=== admin port live: ${ADMIN_PORT_LIVE} ==="
 
 if [ "${ADMIN_PORT_LIVE}" != "true" ]; then
-  echo "ABORT: sshd is not listening on ${REAL_SSH_PORT} -- refusing to add the" \
+  echo "ABORT: sshd is not listening on ${REAL_SSH_PORT}, refusing to add the" \
        ":22 redirect, which would lock out admin access entirely. :22 remains" \
        "real, unredirected sshd. See diagnostics above."
   exit 1
@@ -94,7 +94,7 @@ docker run -d \
 # --network host (not -p 2222:2222) is deliberate: Docker's default bridge
 # networking relays published ports through docker-proxy, a userspace TCP
 # relay that always re-sources connections from the bridge gateway
-# (172.17.0.1) -- silently destroying every attacker's real source IP,
+# (172.17.0.1), silently destroying every attacker's real source IP,
 # which every downstream stage of this project (enrichment, detection,
 # scoring, reporting) depends on. Host networking removes the bridge/proxy
 # entirely, so Cowrie binds straight to the host's real interface.

@@ -1,36 +1,35 @@
 # ADR-0002: Dedicated VPC, no instance profile, IMDSv2 hop-limit 1
 
 ## Context
-The AWS account this runs in predates the project and has unrelated
-resources in it. The sensor is intentionally internet-exposed and intended
-to be compromised.
+This AWS account already had other stuff in it before this project started.
+The sensor is meant to be exposed and, realistically, is going to get
+compromised at the emulated-shell level pretty regularly.
 
 ## Decision
-- The sensor lives in its own VPC (`10.90.0.0/16`), its own subnet, its own
-  route table -- no peering, no shared security groups with anything else
-  in the account.
-- **No IAM instance profile is attached to the instance.** If Cowrie's
-  emulated shell were ever escaped, there is no AWS role to steal.
-- IMDSv2 is enforced (`HttpTokens=required`) with **`HttpPutResponseHopLimit=1`**.
-  This matters specifically because the sensor runs Docker: a container
-  is one network hop further from the instance than a plain process, and a
-  hop limit of 2 (the AWS default in some paths) would let a container reach
-  the instance metadata service. Hop limit 1 blocks that even if a container
-  breaks out.
-- Egress is default-deny at the security group, with narrow allowances for
-  DNS and HTTPS (package installs only).
+- The sensor gets its own VPC (`10.90.0.0/16`), own subnet, own route table.
+  No peering, no shared security groups with anything else in the account.
+- No IAM instance profile attached at all. If Cowrie's fake shell were ever
+  actually escaped, there's just no AWS role sitting there to steal.
+- IMDSv2 enforced (`HttpTokens=required`) with `HttpPutResponseHopLimit=1`.
+  This one matters because the sensor runs Docker: a container is one
+  network hop further from the instance than a normal process, and a hop
+  limit of 2 (which is the default in some setups) would let a container
+  reach the instance metadata service anyway. Hop limit of 1 blocks that
+  even if something breaks out of the container.
+- Egress is default-deny on the security group, with narrow holes for DNS
+  and HTTPS so it can still install packages.
 
-## Why this level, not more or less
-A separate AWS **sub-account** would isolate further (blast radius capped
-even if IAM itself were somehow compromised) but was disproportionate for a
-single micro instance over a weekend -- it adds account-management overhead
-with no meaningful additional protection given there's already no instance
-profile to steal. A dedicated VPC with no profile and a locked-down IMDS is
-the right amount of isolation for the actual risk: the only thing of value
-reachable from a shell on this box is the box itself.
+## Why this much and not more
+A separate AWS sub-account would isolate things even further, but that felt
+like overkill for a single micro instance running for a weekend. It adds
+real account-management overhead for basically no extra protection, since
+there's already no instance profile to steal in the first place. A
+dedicated VPC plus no profile plus a locked-down IMDS matches the actual
+risk here: the only thing worth anything if someone gets a shell on this
+box is the box itself.
 
 ## Consequence
-No AWS API calls can be made *from* the sensor. If a future version of this
-project wanted the sensor to self-report status to AWS, that would need to
-be added deliberately and would arguably weaken this posture -- so it isn't
-planned.
+No AWS API calls can happen from the sensor, period. If a later version of
+this wanted the sensor to report its own status back to AWS somehow, that'd
+have to be a deliberate addition, and it would weaken this setup a bit, so
+it's not something I'm planning to add.

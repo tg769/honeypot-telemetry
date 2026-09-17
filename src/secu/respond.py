@@ -1,4 +1,4 @@
-"""Scored, capped, TTL'd auto-blocklist -- see docs/decisions/0004 for why
+"""Scored, capped, TTL'd auto-blocklist. See docs/decisions/0004 for why
 dry-run is the default and docs/decisions/0003 for why this targets a NACL
 rather than a Security Group.
 
@@ -57,7 +57,7 @@ def compute_scores(findings: list[dict], enrich_cache: dict[str, dict]) -> dict[
     for ip, entry in enrich_cache.items():
         confidence = entry.get("abuseipdb", {}).get("abuseConfidenceScore")
         if confidence:
-            scores[ip] += confidence * 0.3  # weighted, not 1:1 -- our own findings lead
+            scores[ip] += confidence * 0.3  # weighted down, not 1:1; our own findings lead
 
     return dict(scores)
 
@@ -99,7 +99,7 @@ def reconcile(candidates: list[str], scores: dict[str, float]) -> dict:
             to_add.append(ip)
 
     # if adding would exceed the cap, evict the lowest-scored currently-active
-    # entries not already being evicted, to make room -- highest priority wins.
+    # entries not already being evicted, to make room. highest priority wins.
     projected_count = len(still_active) - len(to_evict) + len(to_add)
     if projected_count > settings.responder_max_rules:
         overflow = projected_count - settings.responder_max_rules

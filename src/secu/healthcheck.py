@@ -35,7 +35,7 @@ def check_sensor_reachable() -> tuple[bool, str]:
 
 def check_local_log_growing() -> tuple[bool, str]:
     if not RAW_LOG_PATH.exists():
-        return False, "no local mirror yet -- run collector.py first"
+        return False, "no local mirror yet, run collector.py first"
     state = statefile.load("healthcheck", {"last_size": 0, "last_check": None})
     size = RAW_LOG_PATH.stat().st_size
     grew = size > state["last_size"]

@@ -90,7 +90,7 @@ echo "==> Budget alarm at \$5"
 aws budgets create-budget --account-id "$(aws sts get-caller-identity --query Account --output text)" \
   --budget "{\"BudgetName\":\"${TAG}\",\"BudgetLimit\":{\"Amount\":\"5\",\"Unit\":\"USD\"},\"TimeUnit\":\"MONTHLY\",\"BudgetType\":\"COST\"}" \
   --notifications-with-subscribers "[{\"Notification\":{\"NotificationType\":\"ACTUAL\",\"ComparisonOperator\":\"GREATER_THAN\",\"Threshold\":80},\"Subscribers\":[{\"SubscriptionType\":\"EMAIL\",\"Address\":\"${BUDGET_EMAIL}\"}]}]" \
-  || echo "budget alarm creation failed/exists -- check manually"
+  || echo "budget alarm creation failed or already exists, check manually"
 
 echo
 echo "VPC:      $VPC_ID"

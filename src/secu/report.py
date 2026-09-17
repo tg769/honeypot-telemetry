@@ -27,7 +27,7 @@ def build_report() -> str:
     findings_by_rule = Counter(f["rule_id"] for f in findings_data["findings"])
 
     lines = [
-        f"# Honeypot report -- generated {datetime.now(timezone.utc).isoformat()}",
+        f"# Honeypot report, generated {datetime.now(timezone.utc).isoformat()}",
         "",
         f"- Total events: {len(all_events)}",
         f"- Distinct source IPs: {len(ip_counts)}",
@@ -55,7 +55,7 @@ def build_report() -> str:
         enrichment = enrich_cache.get(ip, {})
         tags = enrichment.get("internetdb", {}).get("tags", [])
         confidence = enrichment.get("abuseipdb", {}).get("abuseConfidenceScore")
-        extra = f" -- tags: {tags}" if tags else ""
+        extra = f", tags: {tags}" if tags else ""
         extra += f", abuseConfidence: {confidence}" if confidence is not None else ""
         lines.append(f"- {ip}: {count} events{extra}")
 
@@ -81,7 +81,7 @@ def main() -> None:
     out_path = REPORTS_DIR / f"report-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M')}.md"
     out_path.write_text(report)
     print(f"wrote {out_path}")
-    print("this is scratch working data (gitignored) -- hand-curate the real deliverable at "
+    print("this is scratch working data (gitignored). Hand-curate the real deliverable at "
           "docs/findings/weekend-report.md once the weekend is over")
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Tears down every resource provisioning created. Run when the collection
-# window is over -- this is what stops the meter.
+# window is over. This is what stops the meter.
 set -euo pipefail
 
 REGION="us-east-1"
