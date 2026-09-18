@@ -1,4 +1,4 @@
-# Weekend findings
+# Findings
 
 ## Headline numbers
 - Collection window: 2026-09-17 21:56 UTC to 2026-09-18 21:44 UTC (about 24 hours)

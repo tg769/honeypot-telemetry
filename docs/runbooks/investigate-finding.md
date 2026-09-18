@@ -35,7 +35,7 @@ somewhere.
    can look the hash up manually on something like VirusTotal's web UI if
    you want to identify the malware family, just don't automate that and
    don't touch the actual file.
-6. Write it up, a line or two in `docs/findings/weekend-report.md` under
+6. Write it up, a line or two in `docs/findings/report.md` under
    whatever section fits (successful logins, payloads, botnet campaigns).
    Include the session ID and whatever specifically made it worth noting,
    not just "there was a hit."

@@ -7,7 +7,7 @@ tier had already expired).
 ## Steps
 1. Do a final collector pull so nothing gets left un-ingested:
    `python -m secu.collector`
-2. Run `report.py` and write the final `docs/findings/weekend-report.md`
+2. Run `report.py` and write the final `docs/findings/report.md`
    before tearing anything down. Once the instance is gone there's no
    going back for anything you forgot to pull.
 3. `bash infra/teardown.sh` terminates the instance and deletes the VPC,

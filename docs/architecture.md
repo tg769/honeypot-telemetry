@@ -37,7 +37,7 @@
 3. `enrich.py` looks up every distinct source IP against Shodan's InternetDB (no key needed) and AbuseIPDB (free tier, budgeted at 1000/day), caching each result for a week so it's not re-querying IPs it already knows about.
 4. `detect.py` runs the actual detection rules: brute force, password spray, successful logins, commands run after a login succeeds, payload downloads. Plus two things that aren't standard rules: grouping IPs into probable botnet campaigns by shared credentials and client fingerprints, and checking what fraction of login attempts match Mirai's published credential list.
 5. `respond.py` scores every IP using those findings plus AbuseIPDB's confidence score, ranks them, throws out anything allowlisted or private, and reconciles against a capped/TTL'd blocklist. It's dry-run unless you pass `--enforce`.
-6. `report.py` writes a markdown snapshot of the current dataset. `docs/findings/weekend-report.md` is the actual hand-written writeup, not something auto-generated.
+6. `report.py` writes a markdown snapshot of the current dataset. `docs/findings/report.md` is the actual hand-written writeup, not something auto-generated.
 7. `healthcheck.py` checks whether the sensor's reachable, the log is growing, HEC is accepting data, and there's still AbuseIPDB quota left.
 
 ## Why pull instead of push for Splunk
