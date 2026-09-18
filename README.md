@@ -6,7 +6,7 @@ I put an SSH honeypot on a real AWS box and built a pipeline around it to
 find out - not guessing, actual source IPs, actual credentials people try,
 actual commands run after a fake login succeeds.
 
-Findings are in [`docs/findings/weekend-report.md`](docs/findings/weekend-report.md).
+Findings are in [`docs/findings/report.md`](docs/findings/report.md).
 
 ## What's actually in here
 

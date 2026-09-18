@@ -82,7 +82,7 @@ def main() -> None:
     out_path.write_text(report)
     print(f"wrote {out_path}")
     print("this is scratch working data (gitignored). Hand-curate the real deliverable at "
-          "docs/findings/weekend-report.md once the weekend is over")
+          "docs/findings/report.md once collection is done")
 
 
 if __name__ == "__main__":
