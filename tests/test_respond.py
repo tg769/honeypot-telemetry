@@ -48,3 +48,57 @@ def test_compute_scores_weights_successful_login_highest():
     ]
     scores = respond.compute_scores(findings, {})
     assert scores["2.2.2.2"] > scores["1.1.1.1"]
+
+
+def test_dry_run_never_persists_active_blocks(monkeypatch):
+    # A dry-run's simulated "active" dict must never be saved. If it were,
+    # a later --enforce run would read it back via reconcile() and think
+    # those blocks already exist, so it would silently skip calling AWS
+    # for any of them. This is exactly the bug that shipped once already.
+    saved = {}
+    monkeypatch.setattr(respond.statefile, "save", lambda name, value: saved.update({name: value}))
+    monkeypatch.setattr(respond, "_audit", lambda *a, **kw: None)  # don't touch the real audit log
+
+    plan = {"to_add": ["1.2.3.4"], "to_evict": [], "active_before": {}}
+    respond.apply_plan(plan, {"1.2.3.4": 50}, enforce=False)
+
+    assert "responder_blocks" not in saved
+
+
+def test_rule_numbers_do_not_collide_with_aws_default_nacl_rule():
+    # AWS's own default NACL uses rule number 100 for its built-in allow-all
+    # rule. Trying to create a custom rule also numbered 100 fails with
+    # NetworkAclEntryAlreadyExists, discovered by actually running --enforce
+    # against a real NACL.
+    active = {}
+    first_assigned = respond._next_free_rule_number(active)
+    assert first_assigned != 100
+
+
+def test_enforce_calls_aws_and_persists_active_blocks(monkeypatch):
+    saved = {}
+    monkeypatch.setattr(respond.statefile, "save", lambda name, value: saved.update({name: value}))
+    monkeypatch.setattr(respond, "_audit", lambda *a, **kw: None)  # don't touch the real audit log
+
+    calls = []
+
+    class FakeClient:
+        def create_network_acl_entry(self, **kwargs):
+            calls.append(kwargs)
+
+    class FakeSession:
+        def __init__(self, *a, **kw):
+            pass
+
+        def client(self, name):
+            return FakeClient()
+
+    monkeypatch.setattr("boto3.Session", FakeSession)
+
+    plan = {"to_add": ["1.2.3.4"], "to_evict": [], "active_before": {}}
+    respond.apply_plan(plan, {"1.2.3.4": 50}, enforce=True)
+
+    assert len(calls) == 1
+    assert calls[0]["CidrBlock"] == "1.2.3.4/32"
+    assert "responder_blocks" in saved
+    assert "1.2.3.4" in saved["responder_blocks"]
