@@ -26,7 +26,10 @@ from secu.config import settings
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("respond")
 
-RULE_NUMBER_BASE = 100
+# 100 is what AWS's own default NACL uses for its built-in allow-all rule,
+# so starting here instead avoids colliding with it (found by trying to
+# create a rule numbered 100 and getting NetworkAclEntryAlreadyExists).
+RULE_NUMBER_BASE = 200
 
 FINDING_WEIGHTS = {
     "SUCCESSFUL_LOGIN": 40,
@@ -166,7 +169,14 @@ def apply_plan(plan: dict, scores: dict[str, float], enforce: bool) -> None:
         }
         _audit("block" if enforce else "block_dry_run", ip, {"rule_number": rule_number, "score": scores.get(ip, 0)})
 
-    statefile.save("responder_blocks", active)
+    # Only persist "active" state when blocks are real. A dry-run's simulated
+    # active dict must not be saved, or a later --enforce run reads it back
+    # via reconcile() and thinks those blocks already exist, so it never
+    # actually calls AWS for any of them. Found this by running --enforce
+    # after a prior dry-run and seeing it report "0 to add" for candidates
+    # that had never actually been created.
+    if enforce:
+        statefile.save("responder_blocks", active)
 
 
 def main() -> None:
