@@ -69,10 +69,4 @@ docs/            architecture notes, decision records, runbooks, findings
    the allowlist check that makes sure the responder can never block your
    own IP or anything private/internal.
 
-## Why the auto-blocker doesn't block anything by default
 
-If it actually blocked attackers on the sensor, it would stop the data from
-coming in - which defeats the point. So `respond.py` scores and logs what it
-*would* block, and only touches AWS if you pass `--enforce`. Details on the
-allowlist and TTL logic in
-[`docs/decisions/0004-dry-run-default.md`](docs/decisions/0004-dry-run-default.md).
