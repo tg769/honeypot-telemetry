@@ -3,7 +3,7 @@
 What actually hits a server the moment it's exposed to the internet?
 
 I put an SSH honeypot on a real AWS box and built a pipeline around it to
-find out - not guessing, actual source IPs, actual credentials people try,
+find out - actual source IPs, actual credentials people try,
 actual commands run after a fake login succeeds.
 
 Findings are in [`docs/findings/report.md`](docs/findings/report.md).
