@@ -24,7 +24,7 @@ Findings are in [`docs/findings/report.md`](docs/findings/report.md).
 More on how it's wired together in [`docs/architecture.md`](docs/architecture.md).
 The reasoning behind some of the less obvious calls (isolation setup,
 pull vs push for logs, why the responder doesn't actually block anything by
-default) is in [`docs/decisions/`](docs/decisions/) if you're curious why.
+default) is in [`docs/decisions.md`](docs/decisions.md) if you're curious why.
 
 ## Layout
 
@@ -65,8 +65,6 @@ docs/            architecture notes, decision records, runbooks, findings
    ```
    Put `collector.py` on a cron/launchd schedule (every 15 min or so) so it
    keeps pulling on its own.
-4. `pytest` runs the test suite - 12 tests, the one that actually matters is
+4. `pytest` runs the test suite - 15 tests, the one that actually matters is
    the allowlist check that makes sure the responder can never block your
    own IP or anything private/internal.
-
-

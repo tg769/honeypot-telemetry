@@ -1,5 +1,5 @@
 """Ships new events from the canonical local store to Splunk over HEC.
-Splunk is never internet-exposed (see docs/decisions/0001). This is a
+Splunk is never internet-exposed (see docs/decisions.md). This is a
 pull-then-push setup: collector.py pulls from the sensor, this pushes to
 Splunk running in local Docker.
 

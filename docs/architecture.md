@@ -42,8 +42,8 @@
 
 ## Why pull instead of push for Splunk
 
-Splunk never has a port open to the internet. The collector reaches out to the sensor on a schedule; the sensor never initiates anything toward the Mac. Reasoning in [ADR-0001](decisions/0001-pull-model.md).
+Splunk never has a port open to the internet. The collector reaches out to the sensor on a schedule; the sensor never initiates anything toward the Mac. Reasoning in [decisions.md](decisions.md#pulling-logs-instead-of-pushing-them).
 
 ## Why the sensor gets its own VPC
 
-This AWS account already had other stuff in it before this project, so the sensor lives in its own VPC with no route to anything else, no IAM instance profile, and IMDSv2 with a hop limit of 1 so a compromised container can't reach instance metadata. Reasoning in [ADR-0002](decisions/0002-dedicated-vpc-isolation.md).
+This AWS account already had other stuff in it before this project, so the sensor lives in its own VPC with no route to anything else, no IAM instance profile, and IMDSv2 with a hop limit of 1 so a compromised container can't reach instance metadata. Reasoning in [decisions.md](decisions.md#isolating-the-sensor-vpc-no-iam-role-imdsv2).

@@ -1,6 +1,6 @@
-"""Scored, capped, TTL'd auto-blocklist. See docs/decisions/0004 for why
-dry-run is the default and docs/decisions/0003 for why this targets a NACL
-rather than a Security Group.
+"""Scored, capped, TTL'd auto-blocklist. See docs/decisions.md for why
+dry-run is the default and why this targets a NACL rather than a Security
+Group.
 
 AWS Security Groups are allow-only, so blocking requires NACL deny entries,
 and a NACL caps out around 20 rules by default. With thousands of observed

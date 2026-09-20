@@ -1,7 +1,6 @@
 """Threat-intel enrichment for observed source IPs.
 
-Sources (see docs/decisions/0005-threat-intel-sources.md for why these two
-and not GreyNoise):
+Sources (see docs/decisions.md for why these two and not GreyNoise):
   - Shodan InternetDB: no key, no rate limit, open ports/CVEs/tags.
   - AbuseIPDB: free key, budgeted at 1000 checks/day.
 
