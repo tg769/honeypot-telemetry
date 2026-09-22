@@ -34,4 +34,4 @@ So the responder always computes and logs what it *would* block. Only a real `--
 
 Ended up using two: Shodan's InternetDB, since it needs no key and no signup and just tells you what else an IP has exposed, and AbuseIPDB, which needs a free key and gives a community-sourced abuse confidence score, budgeted under its real daily limit and cached for a week so the same IP never burns budget twice.
 
-GreyNoise got evaluated and dropped. Their v2 API was retired, and the current v3 free tier requires a business email to even get a key, gmail gets rejected outright. Worth writing down rather than quietly not using it, "looked at a tool and it didn't fit the constraints" is a normal, honest outcome, not something to hide.
+GreyNoise got evaluated and dropped. Their v2 API was retired, and the current v3 free tier requires a business email to even get a key, gmail gets rejected outright. 
