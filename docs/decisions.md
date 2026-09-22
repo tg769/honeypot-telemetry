@@ -28,7 +28,7 @@ This creates a real constraint worth mentioning on its own: a NACL only supports
 
 Blocking attackers on the sensor itself would stop the exact data the project exists to collect, so that alone would justify defaulting to dry-run. But there's a second reason, and it's the one I actually care about more: something that mutates network rules based on a scoring heuristic can go wrong in ways that are hard to predict ahead of time. A scoring bug, a bad allowlist entry, a false positive on a shared IP.
 
-So the responder always computes and logs what it *would* block. Only a real `--enforce` flag lets it call AWS, and before that, an allowlist gets checked first (home IP, the sensor itself, anything private), unconditionally, before scoring even matters. Every block also gets a TTL so nothing is permanent, and every decision, real or simulated, lands in an audit log. If asked "how do you avoid blocking something you shouldn't," that's the actual answer: allowlist first, dry-run by default, TTL on everything, full audit trail.
+So the responder always computes and logs what it *would* block. Only a real `--enforce` flag lets it call AWS, and before that, an allowlist gets checked first (home IP, the sensor itself, anything private), unconditionally, before scoring even matters. Every block also gets a TTL so nothing is permanent, and every decision, real or simulated, lands in an audit log. 
 
 ## Threat intel sources, and the one that got dropped
 
